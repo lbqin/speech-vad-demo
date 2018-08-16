@@ -29,6 +29,7 @@ int cut_add_vad_activity(struct cut_info *cut, int is_active, int is_last);
 void cut_info_free(struct cut_info *cut);
 
 void cut_info_print(struct cut_info *cut);
+int cut_and_write_frame(struct cut_info *cut, int start, int end);
 
 #endif //VAD_DEMO_FILE_CUT_H
 /**

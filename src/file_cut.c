@@ -126,3 +126,36 @@ void cut_info_print(struct cut_info *cut) {
     printf("%s, %s， %d, frame %d\n", cut->is_pervious_active ? "PA" : "PI",
            cut->is_contain_active ? "CA" : "CI", cut->previous_along_frames, cut->current_frame);
 }
+
+int cut_and_write_frame(struct cut_info *cut, int start, int end) {
+    int start_frame = start * SAMPLE_RATE / (1000 * FRAME_SIZE);
+    int end_frame = end * SAMPLE_RATE / (1000 * FRAME_SIZE);
+    int frames = end_frame - start_frame;
+    int size = frames * FRAME_SIZE * sizeof(uint16_t);
+    int start_index = start_frame * FRAME_SIZE * sizeof(uint16_t);
+    snprintf(cut->result_filename, sizeof(cut->output_filename_prefix), "%s", cut->output_filename_prefix);
+
+    uint16_t buffer[size];
+    fseek(cut->fp, start_index, 0);
+    int readed = fread(buffer, 1, size, cut->fp);
+    if (readed > 0) {
+        FILE *res_file = fopen(cut->result_filename, "wb+");
+        if (res_file == NULL) {
+            fprintf(stderr, "file open failed, %s\n", cut->result_filename);
+            return 3;
+        }
+        int written = fwrite(buffer, 1, readed, res_file);
+        fclose(res_file);
+        if (written != readed) {
+            fprintf(stderr, "written is %d, readed is %d\n", written, readed);
+            return 2;
+        }
+        // file_total += written;
+        printf("file write success, %s, written %d\n", cut->result_filename, written);
+        return 0;
+
+    } else {
+        return 1;
+    }
+
+}
