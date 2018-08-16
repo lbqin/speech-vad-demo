@@ -114,7 +114,11 @@ int add_cut_write_file(struct periods *per, struct cut_info *cut){
     long start = 0, end = 0;
 
     start = per->period_start[0];
-    end = per->period_end[size - 1];
+    if(is_ended_fill) {
+        end = per->period_end[size - 1];
+    }else{
+        end = per->period_start[size - 1];
+    }
     cut_and_write_frame(cut, (int)start, (int)end);
 
     return 0;
